@@ -7,10 +7,15 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+<<<<<<< HEAD
 
+=======
+import org.springframework.web.bind.annotation.PutMapping;
+>>>>>>> 7efd630e76626536f763ac316499057e4cb34609
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +53,12 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
         Optional<Product> optionalProduct = repository.findById(id);
+<<<<<<< HEAD
         repository.delete(optionalProduct.get());
     }
+=======
+            repository.delete(optionalProduct.get());
+    }
+
+>>>>>>> 7efd630e76626536f763ac316499057e4cb34609
 }
