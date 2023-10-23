@@ -23,8 +23,8 @@ public class ProductController {
     private ProductRepository repository;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping
-    public void saveProduct(@RequestBody ProductRequestDTO data){
+    @PostMapping("api/v1/products/addproducts")
+    public void saveProduct(@RequestBody ProductRequestDTO data) {
         Product productData = new Product(data);
 
         repository.save(productData);
@@ -32,10 +32,10 @@ public class ProductController {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping
-    public List<ProductResponseDTO> getAll(){
+    @GetMapping("api/v1/products")
+    public List<ProductResponseDTO> getAll() {
         List<ProductResponseDTO> productList = repository.findAll().stream().map(ProductResponseDTO::new).toList();
         return productList;
     }
-    
+
 }
