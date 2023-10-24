@@ -18,12 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.quitandafrescor.product.ProductRequestDTO;
-import com.example.quitandafrescor.product.ProductResponseDTO;
-import com.example.quitandafrescor.product.ProductUpdateDTO;
-import com.example.quitandafrescor.product.ProductUpdateDTOReturn;
-import com.example.quitandafrescor.product.Product;
-import com.example.quitandafrescor.product.ProductRepository;
+import com.example.quitandafrescor.dto.ProductRequestDTO;
+import com.example.quitandafrescor.dto.ProductResponseDTO;
+import com.example.quitandafrescor.dto.ProductUpdateDTO;
+import com.example.quitandafrescor.dto.ProductUpdateDTOReturn;
+import com.example.quitandafrescor.model.Product;
+import com.example.quitandafrescor.repository.ProductRepository;
 
 @RestController
 @RequestMapping("product")

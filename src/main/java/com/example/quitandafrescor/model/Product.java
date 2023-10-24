@@ -1,4 +1,7 @@
-package com.example.quitandafrescor.product;
+package com.example.quitandafrescor.model;
+
+import com.example.quitandafrescor.dto.ProductRequestDTO;
+import com.example.quitandafrescor.dto.ProductUpdateDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
