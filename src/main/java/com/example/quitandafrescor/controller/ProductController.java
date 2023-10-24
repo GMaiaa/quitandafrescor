@@ -7,11 +7,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-<<<<<<< HEAD
 
-=======
 import org.springframework.web.bind.annotation.PutMapping;
->>>>>>> 7efd630e76626536f763ac316499057e4cb34609
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +20,8 @@ import java.util.Optional;
 
 import com.example.quitandafrescor.product.ProductRequestDTO;
 import com.example.quitandafrescor.product.ProductResponseDTO;
-
+import com.example.quitandafrescor.product.ProductUpdateDTO;
+import com.example.quitandafrescor.product.ProductUpdateDTOReturn;
 import com.example.quitandafrescor.product.Product;
 import com.example.quitandafrescor.product.ProductRepository;
 
@@ -53,12 +52,23 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
         Optional<Product> optionalProduct = repository.findById(id);
-<<<<<<< HEAD
         repository.delete(optionalProduct.get());
     }
-=======
-            repository.delete(optionalProduct.get());
-    }
+    
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+@PutMapping("/{id}")
+@Transactional
+public ResponseEntity updateProduct(@PathVariable Long id, @RequestBody ProductUpdateDTO data) {
+    Optional<Product> optionalProduct = repository.findById(id);
 
->>>>>>> 7efd630e76626536f763ac316499057e4cb34609
+    if (optionalProduct.isPresent()) {
+        Product product = optionalProduct.get();
+        product.updateProduct(data);
+        repository.save(product);
+        return ResponseEntity.ok(new ProductUpdateDTOReturn(product));
+    } else {
+        return ResponseEntity.notFound().build();
+    }
+}
+
 }

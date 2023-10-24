@@ -49,4 +49,25 @@ public class Product {
 
     }
 
+    public void updateProduct(ProductUpdateDTO data){
+        if(data.name() != null){
+            this.name = data.name();
+        }   
+        if(data.description() != null){
+            this.description = data.description();
+        }
+        if(data.value() != null){
+            this.value = data.value();
+        }   
+        if(data.image() != null){
+            this.image = data.image();
+        }
+        if(data.amount() != null){
+            this.amount = data.amount();
+        }
+         if(data.category() != null){
+            this.category = data.category();
+        }
+    }
+
 }
