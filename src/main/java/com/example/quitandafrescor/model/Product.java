@@ -9,14 +9,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity(name = "products")
 @Table(name = "products")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -52,23 +55,23 @@ public class Product {
 
     }
 
-    public void updateProduct(ProductUpdateDTO data){
-        if(data.name() != null){
+    public void updateProduct(ProductUpdateDTO data) {
+        if (data.name() != null) {
             this.name = data.name();
-        }   
-        if(data.description() != null){
+        }
+        if (data.description() != null) {
             this.description = data.description();
         }
-        if(data.value() != null){
+        if (data.value() != null) {
             this.value = data.value();
-        }   
-        if(data.image() != null){
+        }
+        if (data.image() != null) {
             this.image = data.image();
         }
-        if(data.amount() != null){
+        if (data.amount() != null) {
             this.amount = data.amount();
         }
-         if(data.category() != null){
+        if (data.category() != null) {
             this.category = data.category();
         }
     }

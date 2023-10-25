@@ -30,45 +30,46 @@ import com.example.quitandafrescor.repository.ProductRepository;
 public class ProductController {
 
     @Autowired
-    private ProductRepository repository;
+    private ProductRepository productRepository;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
     public void saveProduct(@RequestBody ProductRequestDTO data) {
         Product productData = new Product(data);
 
-        repository.save(productData);
+        productRepository.save(productData);
         return;
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping
     public List<ProductResponseDTO> getAll() {
-        List<ProductResponseDTO> productList = repository.findAll().stream().map(ProductResponseDTO::new).toList();
+        List<ProductResponseDTO> productList = productRepository.findAll().stream().map(ProductResponseDTO::new)
+                .toList();
         return productList;
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
-        Optional<Product> optionalProduct = repository.findById(id);
-        repository.delete(optionalProduct.get());
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        productRepository.delete(optionalProduct.get());
     }
-    
-@CrossOrigin(origins = "*", allowedHeaders = "*")
-@PutMapping("/{id}")
-@Transactional
-public ResponseEntity updateProduct(@PathVariable Long id, @RequestBody ProductUpdateDTO data) {
-    Optional<Product> optionalProduct = repository.findById(id);
 
-    if (optionalProduct.isPresent()) {
-        Product product = optionalProduct.get();
-        product.updateProduct(data);
-        repository.save(product);
-        return ResponseEntity.ok(new ProductUpdateDTOReturn(product));
-    } else {
-        return ResponseEntity.notFound().build();
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity updateProduct(@PathVariable Long id, @RequestBody ProductUpdateDTO data) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            product.updateProduct(data);
+            productRepository.save(product);
+            return ResponseEntity.ok(new ProductUpdateDTOReturn(product));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
-}
 
 }
