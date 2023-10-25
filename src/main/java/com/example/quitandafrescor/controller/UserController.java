@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +33,7 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
     @Transactional
     public void saveUser(@RequestBody @Valid UserRequestDTO data) {
@@ -41,6 +43,7 @@ public class UserController {
         return;
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping
     public List<UserResponseDTO> getAllUsers() {
         List<UserResponseDTO> userList = userRepository.findAll().stream().map(UserResponseDTO::new)
@@ -48,12 +51,14 @@ public class UserController {
         return userList;
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         Optional<User> optionalUser = userRepository.findById(id);
         userRepository.delete(optionalUser.get());
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO data) {
