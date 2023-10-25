@@ -50,6 +50,20 @@ public class ProductController {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable Long id) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            ProductResponseDTO productResponseDTO = new ProductResponseDTO(product);
+            return ResponseEntity.ok(productResponseDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
