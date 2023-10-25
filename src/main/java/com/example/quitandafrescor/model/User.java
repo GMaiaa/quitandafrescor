@@ -1,6 +1,7 @@
 package com.example.quitandafrescor.model;
 
 import com.example.quitandafrescor.dto.UserRequestDTO;
+import com.example.quitandafrescor.dto.UserUpdateDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,6 +52,21 @@ public class User {
         this.phone = data.phone();
         this.email = data.email();
         this.password = data.password();
+    }
+
+    public void updateUser(UserUpdateDTO data) {
+        if (data.name() != null) {
+            this.name = data.name();
+        }
+        if (data.phone() != null) {
+            this.phone = data.phone();
+        }
+        if (data.email() != null) {
+            this.email = data.email();
+        }
+        if (data.password() != null) {
+            this.password = data.password();
+        }
     }
 
 }
