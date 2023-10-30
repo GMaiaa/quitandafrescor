@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.example.quitandafrescor.dto.ProductRequestDTO;
 import com.example.quitandafrescor.dto.ProductResponseDTO;
@@ -70,12 +72,13 @@ public class ProductController {
         productRepository.delete(optionalProduct.get());
     }
 
+
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity updateProduct(@PathVariable Long id, @RequestBody ProductUpdateDTO data) {
         Optional<Product> optionalProduct = productRepository.findById(id);
-
+        
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
             product.updateProduct(data);
