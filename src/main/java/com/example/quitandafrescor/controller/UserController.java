@@ -1,7 +1,9 @@
 package com.example.quitandafrescor.controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +17,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.quitandafrescor.dto.ProductResponseDTO;
 import com.example.quitandafrescor.dto.UserRequestDTO;
 import com.example.quitandafrescor.dto.UserResponseDTO;
 import com.example.quitandafrescor.dto.UserUpdateDTO;
 import com.example.quitandafrescor.dto.UserUpdateDTOReturn;
-
+import com.example.quitandafrescor.model.Product;
 import com.example.quitandafrescor.model.User;
 import com.example.quitandafrescor.repository.UserRepository;
+import com.example.quitandafrescor.repository.ProductRepository;
+
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
