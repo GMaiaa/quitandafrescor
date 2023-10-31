@@ -1,9 +1,7 @@
 package com.example.quitandafrescor.controller;
 
-
 import java.util.List;
 import java.util.Optional;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +23,6 @@ import com.example.quitandafrescor.dto.UserUpdateDTOReturn;
 import com.example.quitandafrescor.model.User;
 import com.example.quitandafrescor.repository.UserRepository;
 
-
-
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
@@ -44,7 +40,7 @@ public class UserController {
         User userData = new User(data);
 
         userRepository.save(userData);
-        
+
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -56,15 +52,20 @@ public class UserController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         Optional<User> optionalUser = userRepository.findById(id);
-        userRepository.delete(optionalUser.get());
+        if (optionalUser.isPresent()) {
+            userRepository.delete(optionalUser.get());
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO data) {
+    public ResponseEntity<UserUpdateDTOReturn> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO data) {
         Optional<User> optionalUser = userRepository.findById(id);
 
         if (optionalUser.isPresent()) {
