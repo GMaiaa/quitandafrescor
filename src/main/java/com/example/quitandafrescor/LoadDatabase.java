@@ -1,6 +1,6 @@
 package com.example.quitandafrescor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,29 +14,28 @@ import java.util.List;
 @Configuration
 public class LoadDatabase {
 
-        @Autowired
-        ProductRepository productRepository;
+        private static final String FRUITS = "Fruta";
 
         @Bean
-        public CommandLineRunner initProductDatabase() {
+        public CommandLineRunner initProductDatabase(ProductRepository productRepository) {
                 return args -> {
                         List<Product> products = new ArrayList<>();
 
                         products.add(
                                         new Product(1L, "Maçã", "Red, juicy apple", 1.99f,
-                                                        "https://th.bing.com/th/id/OIP.ibRIn_Z0vVlHIHl7lxKgHgHaHa?w=179&h=180&c=7&r=0&o=5&pid=1.7", 10, "Fruta"));
+                                                        "https://scfoods.fbitsstatic.net/img/p/maca-red-argentina-unidade-70942/257561.jpg?w=800&h=800&v=no-change&qs=ignore", 10, FRUITS));
                         products.add(new Product(2L, "Laranja", "Yellow, citrus fruit", 2.99f,
-                                        "https://th.bing.com/th/id/OIP.jZAEWAGZ2bYcW-V14o6CCwHaFj?w=265&h=199&c=7&r=0&o=5&pid=1.7", 20,
-                                        "Fruta"));
+                                        "https://www.proativaalimentos.com.br/image/cache/catalog/img_prod/Laranja_lima_600x600[1]-1000x1000.jpg", 20,
+                                        FRUITS));
                         products.add(new Product(3L, "Banana", "Yellow, curved fruit", 0.99f,
-                                        "https://th.bing.com/th/id/OIP.EGrXAOdEYSzNrjbZiFP03wHaFj?w=264&h=198&c=7&r=0&o=5&pid=1.7", 30,
-                                        "Fruta"));
+                                        "https://frutasbrasilsul.com.br/wp-content/uploads/banana-nanica.png", 30,
+                                        FRUITS));
                         products.add(
                                         new Product(4L, "Batata", "Brown, starchy vegetable", 0.49f,
-                                                        "https://th.bing.com/th/id/OIP.3UyCi2UAGC4JXav5TF2lHgHaFd?w=241&h=180&c=7&r=0&o=5&pid=1.7", 40,
+                                                        "https://mercadoorganico.com/6428-large_default/batata-inglesa-organica-500g-osm.jpg", 40,
                                                         "Verduras"));
                         products.add(new Product(5L, "Tomate", "Red, juicy fruit", 0.59f,
-                                        "https://th.bing.com/th/id/OIP.Ce5ZcF05xSIfeaCmGdklfwHaGm?w=209&h=187&c=7&r=0&o=5&pid=1.7", 50,
+                                        "https://scfoods.fbitsstatic.net/img/p/tomate-debora-maduro-para-molho-500g-70892/257510.jpg?w=800&h=800&v=no-change&qs=ignore", 50,
                                         "Verdura"));
 
                         productRepository.saveAll(products);
