@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 import com.example.quitandafrescor.dto.ProductRequestDTO;
 import com.example.quitandafrescor.dto.ProductResponseDTO;
@@ -40,15 +40,14 @@ public class ProductController {
         Product productData = new Product(data);
 
         productRepository.save(productData);
-        return;
+        
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping
     public List<ProductResponseDTO> getAll() {
-        List<ProductResponseDTO> productList = productRepository.findAll().stream().map(ProductResponseDTO::new)
+        return productRepository.findAll().stream().map(ProductResponseDTO::new)
                 .toList();
-        return productList;
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
