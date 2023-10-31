@@ -23,21 +23,21 @@ public class LoadDatabase {
                         List<Product> products = new ArrayList<>();
 
                         products.add(
-                                        new Product(1L, "Apple", "Red, juicy apple", 1.99f,
-                                                        "https://example.com/apple.png", 10, "Fruits"));
-                        products.add(new Product(2L, "Orange", "Yellow, citrus fruit", 2.99f,
-                                        "https://example.com/orange.png", 20,
-                                        "Fruits"));
+                                        new Product(1L, "Maçã", "Red, juicy apple", 1.99f,
+                                                        "https://th.bing.com/th/id/OIP.ibRIn_Z0vVlHIHl7lxKgHgHaHa?w=179&h=180&c=7&r=0&o=5&pid=1.7", 10, "Fruta"));
+                        products.add(new Product(2L, "Laranja", "Yellow, citrus fruit", 2.99f,
+                                        "https://th.bing.com/th/id/OIP.jZAEWAGZ2bYcW-V14o6CCwHaFj?w=265&h=199&c=7&r=0&o=5&pid=1.7", 20,
+                                        "Fruta"));
                         products.add(new Product(3L, "Banana", "Yellow, curved fruit", 0.99f,
-                                        "https://example.com/banana.png", 30,
-                                        "Fruits"));
+                                        "https://th.bing.com/th/id/OIP.EGrXAOdEYSzNrjbZiFP03wHaFj?w=264&h=198&c=7&r=0&o=5&pid=1.7", 30,
+                                        "Fruta"));
                         products.add(
-                                        new Product(4L, "Potato", "Brown, starchy vegetable", 0.49f,
-                                                        "https://example.com/potato.png", 40,
-                                                        "Vegetables"));
-                        products.add(new Product(5L, "Tomato", "Red, juicy fruit", 0.59f,
-                                        "https://example.com/tomato.png", 50,
-                                        "Vegetables"));
+                                        new Product(4L, "Batata", "Brown, starchy vegetable", 0.49f,
+                                                        "https://th.bing.com/th/id/OIP.3UyCi2UAGC4JXav5TF2lHgHaFd?w=241&h=180&c=7&r=0&o=5&pid=1.7", 40,
+                                                        "Verduras"));
+                        products.add(new Product(5L, "Tomate", "Red, juicy fruit", 0.59f,
+                                        "https://th.bing.com/th/id/OIP.Ce5ZcF05xSIfeaCmGdklfwHaGm?w=209&h=187&c=7&r=0&o=5&pid=1.7", 50,
+                                        "Verdura"));
 
                         productRepository.saveAll(products);
                 };
