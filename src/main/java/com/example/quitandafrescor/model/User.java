@@ -38,7 +38,6 @@ public class User {
     private String phone;
 
     @Column(name = "email", nullable = false, unique = true)
-
     private String email;
 
     @Column(name = "password", nullable = false)
