@@ -40,7 +40,7 @@ public class Order {
 
     @CPF
     @Column(name = "cpf", nullable = false)
-    private Integer cpf;
+    private String cpf;
 
     @Column(name = "email", nullable = false)
     private String email;

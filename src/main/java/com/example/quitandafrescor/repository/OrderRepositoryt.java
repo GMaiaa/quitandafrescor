@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.example.quitandafrescor.model.Order;
 
 @Repository
-public interface OrderProduct extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, Long> {
     
 }
