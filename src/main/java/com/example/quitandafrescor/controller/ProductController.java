@@ -29,8 +29,12 @@ import com.example.quitandafrescor.repository.ProductRepository;
 @RequestMapping("product")
 public class ProductController {
 
-    @Autowired
+    
     private ProductRepository productRepository;
+
+    public ProductController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
