@@ -34,4 +34,5 @@ public class Cart {
 
     @Column(name = "totalValue", nullable = false)
     private Float totalValue;
+
 }
