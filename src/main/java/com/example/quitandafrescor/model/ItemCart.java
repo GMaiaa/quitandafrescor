@@ -42,5 +42,5 @@ public class ItemCart {
     private Integer quantity;
 
     @Column(name = "subTotalValue", nullable = false)
-    private Float totalValue;
+    private Float subTotalValue;
 }

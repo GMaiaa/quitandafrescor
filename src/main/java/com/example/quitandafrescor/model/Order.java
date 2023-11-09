@@ -13,6 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -64,11 +65,12 @@ public class Order {
     private List<ItemCart> items = new ArrayList<>();
 
     @OneToOne
+    @JoinColumn(name = "cart", nullable = false)
     private Cart cart;
 
     @Column(name = "orderDate", nullable = false)
     private Date orderDate = new Date();
 
-    @Column(name = "totalValue", nullable = false)
-    private Float totalValue;
+
+   
 }
