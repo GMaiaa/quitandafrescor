@@ -1,7 +1,10 @@
 package com.example.quitandafrescor.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,16 +32,18 @@ public class CartController {
 
     private List<ItemCart> itemCart = new ArrayList<>();
 
-    @GetMapping("/addCart/{id}")
-    public ResponseEntity<Void> addCart(@PathVariable Long id) {
+    @GetMapping("/addCart/{id}/{quantity}")
+    public ResponseEntity<Void> addCart(@PathVariable Long id, @PathVariable int quantity) {
+        if (quantity <= 0) {
+            return ResponseEntity.notFound().build();
+        }
         Optional<Product> prod = productRepository.findById(id);
         if (prod.isPresent()) {
             Product product = prod.get();
             ItemCart item = new ItemCart();
             item.setProduct(product);
             item.setProductValue(product.getValue());
-            item.setQuantity(0); // Inicializa a quantidade com 0
-            item.setQuantity(item.getQuantity() + 1);
+            item.setQuantity(quantity); // Define a quantidade com o valor fornecido pelo usuário
             item.setSubTotalValue(item.getProductValue() * item.getQuantity());
             itemCart.add(item);
             itemCartRepository.saveAll(itemCart);
