@@ -34,10 +34,6 @@ public class ItemCart {
     @JoinColumn(name = "cartId")
     private Cart cart;
 
-    @ManyToOne
-    @JoinColumn(name = "orderId")
-    private Order order;
-
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 

@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,9 +19,11 @@ import com.example.quitandafrescor.dto.CartResponseDTO;
 import com.example.quitandafrescor.dto.ItemCartRequestDTO;
 import com.example.quitandafrescor.dto.ItemCartResponseDTO;
 import com.example.quitandafrescor.dto.ItemCartUpdateDTOReturn;
+import com.example.quitandafrescor.model.Cart;
 import com.example.quitandafrescor.model.ItemCart;
 
 import com.example.quitandafrescor.model.Product;
+import com.example.quitandafrescor.repository.CartRepository;
 import com.example.quitandafrescor.repository.ItemCartRepository;
 import com.example.quitandafrescor.repository.ProductRepository;
 
@@ -32,9 +35,14 @@ public class CartController {
 
     private ItemCartRepository itemCartRepository;
 
-    public CartController(ProductRepository productRepository, ItemCartRepository itemCartRepository) {
+    private CartRepository cartRepository;
+
+    public CartController(ProductRepository productRepository, ItemCartRepository itemCartRepository,
+            CartRepository cartRepository) {
         this.productRepository = productRepository;
         this.itemCartRepository = itemCartRepository;
+        this.cartRepository = cartRepository;
+
     }
 
     private float calculateTotalCartValue() {
@@ -71,10 +79,21 @@ public class CartController {
             Product product = prod.get();
 
             // Busca o carrinho de compras do repositório
-            List<ItemCart> itemCart = itemCartRepository.findAll();
+            List<Cart> carts = cartRepository.findAll();
+
+            // Se não houver nenhum carrinho ou o último carrinho já estiver associado a um
+            // pedido, cria um novo carrinho
+            Cart cart;
+            if (carts.isEmpty() || carts.get(carts.size() - 1).getOrder() != null) {
+                cart = new Cart();
+                cart.setTotalValue(0f);
+                cartRepository.save(cart);
+            } else {
+                cart = carts.get(carts.size() - 1);
+            }
 
             // Verifica se o produto já está no carrinho
-            Optional<ItemCart> existingItem = itemCart.stream()
+            Optional<ItemCart> existingItem = cart.getItens().stream()
                     .filter(item -> item.getProduct().getId().equals(product.getId()))
                     .findFirst();
 
@@ -91,8 +110,18 @@ public class CartController {
                 item.setProductValue(product.getValue());
                 item.setQuantity(1);
                 item.setSubTotalValue(item.getProductValue() * item.getQuantity());
+                item.setCart(cart); // Associa o item ao carrinho
                 itemCartRepository.save(item);
+                cart.getItens().add(item); // Atualiza a lista de itens no carrinho
             }
+
+            // Recalcula o valor total do carrinho
+            float totalValue = 0f;
+            for (ItemCart item : cart.getItens()) {
+                totalValue += item.getSubTotalValue();
+            }
+            cart.setTotalValue(totalValue);
+            cartRepository.save(cart);
 
             return ResponseEntity.ok().build();
         } else {

@@ -1,20 +1,16 @@
 package com.example.quitandafrescor.model;
 
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.hibernate.validator.constraints.br.CPF;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -34,7 +30,7 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "client", nullable = false)
     private String client;
 
@@ -45,7 +41,6 @@ public class Order {
     @Column(name = "email", nullable = false)
     private String email;
 
-    
     @Column(name = "cep", nullable = true)
     private Integer cep;
 
@@ -61,16 +56,11 @@ public class Order {
     @Column(name = "moneyChange", nullable = true)
     private Float moneyChange;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<ItemCart> items = new ArrayList<>();
-
     @OneToOne
-    @JoinColumn(name = "cart", nullable = false)
+    @JoinColumn(name = "cartId", nullable = false)
     private Cart cart;
 
     @Column(name = "orderDate", nullable = false)
     private Date orderDate = new Date();
 
-
-   
 }
