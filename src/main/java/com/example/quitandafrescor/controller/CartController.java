@@ -10,10 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.example.quitandafrescor.dto.CartResponseDTO;
 import com.example.quitandafrescor.dto.ItemCartRequestDTO;
 import com.example.quitandafrescor.dto.ItemCartResponseDTO;
 import com.example.quitandafrescor.dto.ItemCartUpdateDTOReturn;
@@ -24,20 +25,43 @@ import com.example.quitandafrescor.repository.ItemCartRepository;
 import com.example.quitandafrescor.repository.ProductRepository;
 
 @RestController
-@RequestMapping("itemCart")
-public class ItemCartController {
+@RequestMapping("cart")
+public class CartController {
 
     private ProductRepository productRepository;
 
     private ItemCartRepository itemCartRepository;
 
-    public ItemCartController(ProductRepository productRepository, ItemCartRepository itemCartRepository) {
+    public CartController(ProductRepository productRepository, ItemCartRepository itemCartRepository) {
         this.productRepository = productRepository;
         this.itemCartRepository = itemCartRepository;
-
     }
 
-    private List<ItemCart> itemCart = new ArrayList<>();
+    private float calculateTotalCartValue() {
+        List<ItemCart> items = itemCartRepository.findAll();
+        float totalValue = 0;
+        for (ItemCart item : items) {
+            totalValue += item.getSubTotalValue();
+        }
+        totalValue = Math.round(totalValue * 100.0) / 100.0f;
+        return totalValue;
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping("/getAllCartItems")
+    public ResponseEntity<CartResponseDTO> getAllCartItems() {
+        List<ItemCart> items = itemCartRepository.findAll();
+        if (items.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            float totalValue = calculateTotalCartValue();
+            List<ItemCartResponseDTO> itemDtos = items.stream()
+                    .map(item -> new ItemCartResponseDTO(item, item.getProduct()))
+                    .collect(Collectors.toList());
+            CartResponseDTO response = new CartResponseDTO(itemDtos, totalValue);
+            return ResponseEntity.ok(response);
+        }
+    }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/addCart/{id}")
@@ -45,6 +69,9 @@ public class ItemCartController {
         Optional<Product> prod = productRepository.findById(id);
         if (prod.isPresent()) {
             Product product = prod.get();
+
+            // Busca o carrinho de compras do repositório
+            List<ItemCart> itemCart = itemCartRepository.findAll();
 
             // Verifica se o produto já está no carrinho
             Optional<ItemCart> existingItem = itemCart.stream()
@@ -56,6 +83,7 @@ public class ItemCartController {
                 ItemCart item = existingItem.get();
                 item.setQuantity(item.getQuantity() + 1);
                 item.setSubTotalValue(item.getProductValue() * item.getQuantity());
+                itemCartRepository.save(item);
             } else {
                 // Se o produto não está no carrinho, adiciona um novo item
                 ItemCart item = new ItemCart();
@@ -63,10 +91,9 @@ public class ItemCartController {
                 item.setProductValue(product.getValue());
                 item.setQuantity(1);
                 item.setSubTotalValue(item.getProductValue() * item.getQuantity());
-                itemCart.add(item);
+                itemCartRepository.save(item);
             }
 
-            itemCartRepository.saveAll(itemCart);
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();

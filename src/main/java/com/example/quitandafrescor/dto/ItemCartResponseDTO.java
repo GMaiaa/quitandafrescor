@@ -4,13 +4,14 @@ import com.example.quitandafrescor.model.ItemCart;
 import com.example.quitandafrescor.model.Product;
 
 public record ItemCartResponseDTO(Long id, String productName, Float productValue, Integer quantity,
-        Float subTotalValue) {
+        Float subTotalValue, String productImage) {
     public ItemCartResponseDTO(ItemCart itemCart, Product product) {
         this(
                 itemCart.getId(),
                 product.getName(),
                 product.getValue(),
                 itemCart.getQuantity(),
-                itemCart.getSubTotalValue());
+                itemCart.getSubTotalValue(),
+                product.getImage());
     }
 }
