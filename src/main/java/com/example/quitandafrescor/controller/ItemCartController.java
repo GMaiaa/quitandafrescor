@@ -24,14 +24,14 @@ import com.example.quitandafrescor.repository.ItemCartRepository;
 import com.example.quitandafrescor.repository.ProductRepository;
 
 @RestController
-@RequestMapping("cart")
-public class CartController {
+@RequestMapping("itemCart")
+public class ItemCartController {
 
     private ProductRepository productRepository;
 
     private ItemCartRepository itemCartRepository;
 
-    public CartController(ProductRepository productRepository, ItemCartRepository itemCartRepository) {
+    public ItemCartController(ProductRepository productRepository, ItemCartRepository itemCartRepository) {
         this.productRepository = productRepository;
         this.itemCartRepository = itemCartRepository;
 
@@ -45,13 +45,27 @@ public class CartController {
         Optional<Product> prod = productRepository.findById(id);
         if (prod.isPresent()) {
             Product product = prod.get();
-            ItemCart item = new ItemCart();
-            item.setProduct(product);
-            item.setProductValue(product.getValue());
-            item.setQuantity(0); // Inicializa a quantidade com 0
-            item.setQuantity(item.getQuantity() + 1);
-            item.setSubTotalValue(item.getProductValue() * item.getQuantity());
-            itemCart.add(item);
+
+            // Verifica se o produto já está no carrinho
+            Optional<ItemCart> existingItem = itemCart.stream()
+                    .filter(item -> item.getProduct().getId().equals(product.getId()))
+                    .findFirst();
+
+            if (existingItem.isPresent()) {
+                // Se o produto já está no carrinho, apenas incrementa a quantidade
+                ItemCart item = existingItem.get();
+                item.setQuantity(item.getQuantity() + 1);
+                item.setSubTotalValue(item.getProductValue() * item.getQuantity());
+            } else {
+                // Se o produto não está no carrinho, adiciona um novo item
+                ItemCart item = new ItemCart();
+                item.setProduct(product);
+                item.setProductValue(product.getValue());
+                item.setQuantity(1);
+                item.setSubTotalValue(item.getProductValue() * item.getQuantity());
+                itemCart.add(item);
+            }
+
             itemCartRepository.saveAll(itemCart);
             return ResponseEntity.ok().build();
         } else {
@@ -73,7 +87,7 @@ public class CartController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ItemCartUpdateDTOReturn> updateItemCart(@PathVariable Long id,
+    public ResponseEntity<ItemCartUpdateDTOReturn> updateItemCartQuantity(@PathVariable Long id,
             @RequestBody ItemCartRequestDTO request) {
         Optional<ItemCart> itemOpt = itemCartRepository.findById(id);
         if (itemOpt.isPresent()) {
