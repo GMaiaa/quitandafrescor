@@ -25,6 +25,7 @@ import com.example.quitandafrescor.model.ItemCart;
 import com.example.quitandafrescor.model.Product;
 import com.example.quitandafrescor.repository.CartRepository;
 import com.example.quitandafrescor.repository.ItemCartRepository;
+
 import com.example.quitandafrescor.repository.ProductRepository;
 
 @RestController
@@ -116,11 +117,7 @@ public class CartController {
             }
 
             // Recalcula o valor total do carrinho
-            float totalValue = 0f;
-            for (ItemCart item : cart.getItens()) {
-                totalValue += item.getSubTotalValue();
-            }
-            cart.setTotalValue(totalValue);
+            cart.setTotalValue(calculateTotalCartValue());
             cartRepository.save(cart);
 
             return ResponseEntity.ok().build();
@@ -153,6 +150,12 @@ public class CartController {
             itemCartRepository.save(item);
             Product product = item.getProduct();
             ItemCartUpdateDTOReturn response = new ItemCartUpdateDTOReturn(product, item);
+
+            // Recalcula o valor total do carrinho
+            Cart cart = item.getCart();
+            cart.setTotalValue(calculateTotalCartValue());
+            cartRepository.save(cart);
+
             return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.notFound().build();
@@ -163,6 +166,13 @@ public class CartController {
     public ResponseEntity<Void> deleteItemCart(@PathVariable Long id) {
         Optional<ItemCart> itemOpt = itemCartRepository.findById(id);
         if (itemOpt.isPresent()) {
+            ItemCart item = itemOpt.get();
+
+            // Recalcula o valor total do carrinho antes de excluir o item
+            Cart cart = item.getCart();
+            cart.setTotalValue(cart.getTotalValue() - item.getSubTotalValue());
+            cartRepository.save(cart);
+
             itemCartRepository.deleteById(id);
             return ResponseEntity.ok().build();
         } else {
