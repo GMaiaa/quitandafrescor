@@ -24,9 +24,11 @@ import com.example.quitandafrescor.dto.OrderRequestDTO;
 import com.example.quitandafrescor.model.Cart;
 import com.example.quitandafrescor.model.ItemCart;
 import com.example.quitandafrescor.model.Order;
+import com.example.quitandafrescor.model.OrderItem;
 import com.example.quitandafrescor.model.Product;
 import com.example.quitandafrescor.repository.CartRepository;
 import com.example.quitandafrescor.repository.ItemCartRepository;
+import com.example.quitandafrescor.repository.OrderItemRepository;
 import com.example.quitandafrescor.repository.ProductRepository;
 import com.example.quitandafrescor.repository.OrderRepository;
 
@@ -42,13 +44,15 @@ public class CartController {
 
     private CartRepository cartRepository;
 
+    private OrderItemRepository orderItemRepository;
+
     public CartController(ProductRepository productRepository, ItemCartRepository itemCartRepository,
-            CartRepository cartRepository, OrderRepository orderRepository) {
+            CartRepository cartRepository, OrderRepository orderRepository, OrderItemRepository orderItemRepository) {
         this.productRepository = productRepository;
         this.itemCartRepository = itemCartRepository;
         this.cartRepository = cartRepository;
         this.orderRepository = orderRepository;
-
+        this.orderItemRepository = orderItemRepository;
     }
 
     private float calculateTotalCartValue() {
@@ -63,7 +67,7 @@ public class CartController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/confirmPurchase")
-    public ResponseEntity<Order> confirmPurchase(@RequestBody OrderRequestDTO orderDto) {
+    public ResponseEntity<Void> confirmPurchase(@RequestBody OrderRequestDTO orderDto) {
         // Busca o último carrinho de compras do repositório
         List<Cart> carts = cartRepository.findAll();
         if (carts.isEmpty()) {
@@ -86,13 +90,21 @@ public class CartController {
         order.setCart(cart);
         orderRepository.save(order);
 
-        // Limpa os itens do carrinho
+        // Cria um OrderItem para cada ItemCart no carrinho e deleta o ItemCart
         List<ItemCart> items = new ArrayList<>(cart.getItens());
-        for (ItemCart item : items) {
-            cart.getItens().remove(item); // Remove a associação do item com o carrinho
-            item.setCart(null); // Remove a associação do carrinho com o item
-            itemCartRepository.save(item); // Salva o item sem a associação
-            itemCartRepository.delete(item); // Agora você pode deletar o item
+        for (ItemCart itemCart : items) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
+            orderItem.setProductName(itemCart.getProduct().getName());
+            orderItem.setProductValue(itemCart.getProductValue());
+            orderItem.setQuantity(itemCart.getQuantity());
+            orderItem.setSubTotalValue(itemCart.getSubTotalValue());
+            orderItemRepository.save(orderItem);
+
+            cart.getItens().remove(itemCart); // Remove a associação do item com o carrinho
+            itemCart.setCart(null); // Remove a associação do carrinho com o item
+            itemCartRepository.save(itemCart); // Salva o item sem a associação
+            itemCartRepository.delete(itemCart); // Agora você pode deletar o item
         }
 
         // Cria um novo carrinho para compras futuras
@@ -100,7 +112,8 @@ public class CartController {
         newCart.setTotalValue(0f);
         cartRepository.save(newCart);
 
-        return ResponseEntity.ok(order);
+        // Retorna apenas o status OK sem corpo
+        return ResponseEntity.ok().build();
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -173,6 +186,7 @@ public class CartController {
         }
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
     public ResponseEntity<ItemCartResponseDTO> getCartById(@PathVariable Long id) {
         Optional<ItemCart> itemOpt = itemCartRepository.findById(id);
@@ -186,6 +200,7 @@ public class CartController {
         }
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
     public ResponseEntity<ItemCartUpdateDTOReturn> updateItemCartQuantity(@PathVariable Long id,
             @RequestBody ItemCartRequestDTO request) {
@@ -209,6 +224,7 @@ public class CartController {
         }
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteItemCart(@PathVariable Long id) {
         Optional<ItemCart> itemOpt = itemCartRepository.findById(id);

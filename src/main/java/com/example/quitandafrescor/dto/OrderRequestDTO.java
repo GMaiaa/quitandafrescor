@@ -1,5 +1,7 @@
 package com.example.quitandafrescor.dto;
 
+import java.util.List;
+
 public record OrderRequestDTO(String client, String cpf, String email, Integer cep, Integer adressNumber,
-        Integer phoneNumber, String paymentMethod, Float moneyChange) {
+        String phoneNumber, String paymentMethod, Float moneyChange, List<OrderItemResponseDTO> orderItems) {
 }
