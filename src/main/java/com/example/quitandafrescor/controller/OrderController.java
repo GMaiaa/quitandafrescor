@@ -34,10 +34,11 @@ public class OrderController {
             List<OrderResponseDTO> orderDtos = orders.stream()
                     .map(order -> {
                         Cart cart = order.getCart();
-                        return new OrderResponseDTO(order, cart.getTotalValue(), cart);
+                        return new OrderResponseDTO(order, order.getStatus(), cart.getTotalValue(), cart);
                     })
                     .collect(Collectors.toList());
             return ResponseEntity.ok(orderDtos);
         }
     }
+
 }

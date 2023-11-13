@@ -68,4 +68,6 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 
+    @Column(name = "status", nullable = true)
+    private String status;
 }

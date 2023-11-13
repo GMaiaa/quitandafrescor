@@ -85,6 +85,7 @@ public class CartController {
         order.setPhoneNumber(orderDto.phoneNumber());
         order.setPaymentMethod(orderDto.paymentMethod());
         order.setMoneyChange(orderDto.moneyChange());
+        order.setStatus("Waiting"); // Define o status do pedido como "Waiting"
 
         // Associa o carrinho ao pedido e salva o pedido
         order.setCart(cart);

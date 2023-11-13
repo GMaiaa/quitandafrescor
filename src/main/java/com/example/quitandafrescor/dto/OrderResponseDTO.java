@@ -9,8 +9,8 @@ import com.example.quitandafrescor.model.Order;
 
 public record OrderResponseDTO(Long id, String client, String cpf, String email, Integer cep, Integer adressNumber,
         String phoneNumber, String paymentMethod, Float moneyChange, Long cartId, Date orderDate,
-        Float totalValue, List<OrderItemResponseDTO> items) {
-    public OrderResponseDTO(Order order, Float totalValue, Cart cart) {
+        String status, Float totalValue, List<OrderItemResponseDTO> items) {
+    public OrderResponseDTO(Order order, String status, Float totalValue, Cart cart) {
         this(
                 order.getId(),
                 order.getClient(),
@@ -23,6 +23,7 @@ public record OrderResponseDTO(Long id, String client, String cpf, String email,
                 order.getMoneyChange(),
                 cart.getId(),
                 order.getOrderDate(),
+                status,
                 totalValue,
                 // Aqui você precisa adicionar a lógica para converter os itens do pedido em
                 // OrderItemResponseDTO
