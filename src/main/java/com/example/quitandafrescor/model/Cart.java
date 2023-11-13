@@ -3,6 +3,8 @@ package com.example.quitandafrescor.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,6 +38,7 @@ public class Cart {
     @Column(name = "totalValue", nullable = false)
     private Float totalValue;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "cart")
     private Order order;
 }

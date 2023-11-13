@@ -5,12 +5,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,14 +20,15 @@ import com.example.quitandafrescor.dto.CartResponseDTO;
 import com.example.quitandafrescor.dto.ItemCartRequestDTO;
 import com.example.quitandafrescor.dto.ItemCartResponseDTO;
 import com.example.quitandafrescor.dto.ItemCartUpdateDTOReturn;
+import com.example.quitandafrescor.dto.OrderRequestDTO;
 import com.example.quitandafrescor.model.Cart;
 import com.example.quitandafrescor.model.ItemCart;
-
+import com.example.quitandafrescor.model.Order;
 import com.example.quitandafrescor.model.Product;
 import com.example.quitandafrescor.repository.CartRepository;
 import com.example.quitandafrescor.repository.ItemCartRepository;
-
 import com.example.quitandafrescor.repository.ProductRepository;
+import com.example.quitandafrescor.repository.OrderRepository;
 
 @RestController
 @RequestMapping("cart")
@@ -36,13 +38,16 @@ public class CartController {
 
     private ItemCartRepository itemCartRepository;
 
+    private OrderRepository orderRepository;
+
     private CartRepository cartRepository;
 
     public CartController(ProductRepository productRepository, ItemCartRepository itemCartRepository,
-            CartRepository cartRepository) {
+            CartRepository cartRepository, OrderRepository orderRepository) {
         this.productRepository = productRepository;
         this.itemCartRepository = itemCartRepository;
         this.cartRepository = cartRepository;
+        this.orderRepository = orderRepository;
 
     }
 
@@ -54,6 +59,48 @@ public class CartController {
         }
         totalValue = Math.round(totalValue * 100.0) / 100.0f;
         return totalValue;
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("/confirmPurchase")
+    public ResponseEntity<Order> confirmPurchase(@RequestBody OrderRequestDTO orderDto) {
+        // Busca o último carrinho de compras do repositório
+        List<Cart> carts = cartRepository.findAll();
+        if (carts.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        Cart cart = carts.get(carts.size() - 1);
+
+        // Cria um novo pedido a partir do DTO
+        Order order = new Order();
+        order.setClient(orderDto.client());
+        order.setCpf(orderDto.cpf());
+        order.setEmail(orderDto.email());
+        order.setCep(orderDto.cep());
+        order.setAdressNumber(orderDto.adressNumber());
+        order.setPhoneNumber(orderDto.phoneNumber());
+        order.setPaymentMethod(orderDto.paymentMethod());
+        order.setMoneyChange(orderDto.moneyChange());
+
+        // Associa o carrinho ao pedido e salva o pedido
+        order.setCart(cart);
+        orderRepository.save(order);
+
+        // Limpa os itens do carrinho
+        List<ItemCart> items = new ArrayList<>(cart.getItens());
+        for (ItemCart item : items) {
+            cart.getItens().remove(item); // Remove a associação do item com o carrinho
+            item.setCart(null); // Remove a associação do carrinho com o item
+            itemCartRepository.save(item); // Salva o item sem a associação
+            itemCartRepository.delete(item); // Agora você pode deletar o item
+        }
+
+        // Cria um novo carrinho para compras futuras
+        Cart newCart = new Cart();
+        newCart.setTotalValue(0f);
+        cartRepository.save(newCart);
+
+        return ResponseEntity.ok(order);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
