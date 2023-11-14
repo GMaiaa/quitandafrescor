@@ -62,4 +62,18 @@ public class OrderController {
         }
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping("/getOrderById/{id}")
+    public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable Long id) {
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+        if (optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            Cart cart = order.getCart();
+            OrderResponseDTO orderDto = new OrderResponseDTO(order, order.getStatus(), cart.getTotalValue(), cart);
+            return ResponseEntity.ok(orderDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
