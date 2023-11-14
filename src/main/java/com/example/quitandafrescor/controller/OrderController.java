@@ -1,15 +1,21 @@
 package com.example.quitandafrescor.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.quitandafrescor.dto.OrderResponseDTO;
+import com.example.quitandafrescor.dto.OrderUpdateDTO;
+import com.example.quitandafrescor.dto.OrderUpdateDTOReturn;
 import com.example.quitandafrescor.model.Cart;
 import com.example.quitandafrescor.model.Order;
 import com.example.quitandafrescor.repository.OrderRepository;
@@ -38,6 +44,21 @@ public class OrderController {
                     })
                     .collect(Collectors.toList());
             return ResponseEntity.ok(orderDtos);
+        }
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PutMapping("/updateOrderStatus/{id}")
+    public ResponseEntity<OrderUpdateDTOReturn> updateOrderStatus(@PathVariable Long id,
+            @RequestBody OrderUpdateDTO orderUpdateDto) {
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+        if (optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            order.setStatus(orderUpdateDto.status());
+            orderRepository.save(order);
+            return ResponseEntity.ok(new OrderUpdateDTOReturn(order));
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
