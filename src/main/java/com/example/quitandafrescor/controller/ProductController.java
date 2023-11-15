@@ -1,6 +1,5 @@
 package com.example.quitandafrescor.controller;
 
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,11 +28,18 @@ import com.example.quitandafrescor.repository.ProductRepository;
 @RequestMapping("product")
 public class ProductController {
 
-    
     private ProductRepository productRepository;
 
     public ProductController(ProductRepository productRepository) {
         this.productRepository = productRepository;
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping("/relatedProducts/{category}")
+    public List<ProductResponseDTO> getRelatedProducts(@PathVariable String category) {
+        return productRepository.findByCategory(category).stream()
+                .map(ProductResponseDTO::new)
+                .toList();
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
