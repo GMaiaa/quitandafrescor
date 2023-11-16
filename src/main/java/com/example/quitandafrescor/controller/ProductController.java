@@ -1,5 +1,6 @@
 package com.example.quitandafrescor.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,11 +45,18 @@ public class ProductController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveProduct(@RequestBody ProductRequestDTO data) {
-        Product productData = new Product(data);
-
-        productRepository.save(productData);
-
+    public ResponseEntity<String> saveProduct(@RequestBody ProductRequestDTO data) {
+        Optional<Product> existingProductWithName = productRepository.findByNameIgnoreCase(data.name());
+        Optional<Product> existingProductWithImage = productRepository.findByImage(data.image());
+        if (existingProductWithName.isPresent()) {
+            return new ResponseEntity<>("Product with the same name already exists", HttpStatus.BAD_REQUEST);
+        } else if (existingProductWithImage.isPresent()) {
+            return new ResponseEntity<>("Product with the same image URL already exists", HttpStatus.BAD_REQUEST);
+        } else {
+            Product productData = new Product(data);
+            productRepository.save(productData);
+            return new ResponseEntity<>("Product saved successfully", HttpStatus.CREATED);
+        }
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")

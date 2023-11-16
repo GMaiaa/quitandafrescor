@@ -72,7 +72,8 @@ public class OrderController {
             // no estoque
             if (!oldStatus.equals("🔴 Cancelado") && order.getStatus().equals("🔴 Cancelado")) {
                 for (OrderItem orderItem : order.getOrderItems()) {
-                    Optional<Product> optionalProduct = productRepository.findByName(orderItem.getProductName());
+                    Optional<Product> optionalProduct = productRepository
+                            .findByNameIgnoreCase(orderItem.getProductName());
                     if (optionalProduct.isPresent()) {
                         Product product = optionalProduct.get();
                         product.setAmount(product.getAmount() + orderItem.getQuantity());
@@ -100,7 +101,7 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/getMostOrderedProducts")
     public ResponseEntity<List<Product>> getMostOrderedProducts() {
@@ -120,7 +121,7 @@ public class OrderController {
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .map(entry -> {
                     // Busca os detalhes do produto a partir do repositório de produtos
-                    Optional<Product> optionalProduct = productRepository.findByName(entry.getKey());
+                    Optional<Product> optionalProduct = productRepository.findByNameIgnoreCase(entry.getKey());
                     return optionalProduct.orElse(null);
                 })
                 .filter(Objects::nonNull) // Filtra produtos não encontrados

@@ -12,5 +12,7 @@ import com.example.quitandafrescor.model.Product;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategory(String category);
 
-    Optional<Product> findByName(String name);
+    Optional<Product> findByNameIgnoreCase(String name);
+
+    Optional<Product> findByImage(String image);
 }
