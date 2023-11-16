@@ -66,61 +66,65 @@ public class CartController {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("/confirmPurchase")
-    public ResponseEntity<Void> confirmPurchase(@RequestBody OrderRequestDTO orderDto) {
-        // Busca o último carrinho de compras do repositório
-        List<Cart> carts = cartRepository.findAll();
-        if (carts.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        Cart cart = carts.get(carts.size() - 1);
-
-        // Cria um novo pedido a partir do DTO
-        Order order = new Order();
-        order.setClient(orderDto.client());
-        order.setCpf(orderDto.cpf());
-        order.setEmail(orderDto.email());
-        order.setCep(orderDto.cep());
-        order.setAdressNumber(orderDto.adressNumber());
-        order.setPhoneNumber(orderDto.phoneNumber());
-        order.setPaymentMethod(orderDto.paymentMethod());
-        order.setMoneyChange(orderDto.moneyChange());
-        order.setStatus("🟡 Pendente"); // Define o status do pedido como "Waiting"
-
-        // Associa o carrinho ao pedido e salva o pedido
-        order.setCart(cart);
-        orderRepository.save(order);
-
-        // Cria um OrderItem para cada ItemCart no carrinho e deleta o ItemCart
-        List<ItemCart> items = new ArrayList<>(cart.getItens());
-        for (ItemCart itemCart : items) {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(order);
-            orderItem.setProductName(itemCart.getProduct().getName());
-            orderItem.setProductValue(itemCart.getProductValue());
-            orderItem.setQuantity(itemCart.getQuantity());
-            orderItem.setSubTotalValue(itemCart.getSubTotalValue());
-            orderItemRepository.save(orderItem);
-
-            // Atualiza o estoque do produto
-            Product product = itemCart.getProduct();
-            product.setAmount(product.getAmount() - itemCart.getQuantity());
-            productRepository.save(product);
-
-            cart.getItens().remove(itemCart); // Remove a associação do item com o carrinho
-            itemCart.setCart(null); // Remove a associação do carrinho com o item
-            itemCartRepository.save(itemCart); // Salva o item sem a associação
-            itemCartRepository.delete(itemCart); // Agora você pode deletar o item
-        }
-
-        // Cria um novo carrinho para compras futuras
-        Cart newCart = new Cart();
-        newCart.setTotalValue(0f);
-        cartRepository.save(newCart);
-
-        // Retorna apenas o status OK sem corpo
-        return ResponseEntity.ok().build();
+@PostMapping("/confirmPurchase")
+public ResponseEntity<Void> confirmPurchase(@RequestBody OrderRequestDTO orderDto) {
+    // Busca o último carrinho de compras do repositório
+    List<Cart> carts = cartRepository.findAll();
+    if (carts.isEmpty()) {
+        return ResponseEntity.badRequest().build();
     }
+    Cart cart = carts.get(carts.size() - 1);
+
+    // Cria um novo pedido a partir do DTO
+    Order order = new Order();
+    order.setClient(orderDto.client());
+    order.setCpf(orderDto.cpf());
+    order.setEmail(orderDto.email());
+    order.setCep(orderDto.cep());
+    order.setAdressNumber(orderDto.adressNumber());
+    order.setPhoneNumber(orderDto.phoneNumber());
+    order.setPaymentMethod(orderDto.paymentMethod());
+    order.setMoneyChange(orderDto.moneyChange());
+    order.setStatus("🟡 Pendente"); // Define o status do pedido como "Waiting"
+
+    // Associa o carrinho ao pedido e salva o pedido
+    order.setCart(cart);
+    orderRepository.save(order);
+
+    // Cria um OrderItem para cada ItemCart no carrinho e deleta o ItemCart
+    List<ItemCart> items = new ArrayList<>(cart.getItens());
+    for (ItemCart itemCart : items) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrder(order);
+        orderItem.setProductName(itemCart.getProduct().getName());
+        orderItem.setProductValue(itemCart.getProductValue());
+        orderItem.setQuantity(itemCart.getQuantity());
+        orderItem.setSubTotalValue(itemCart.getSubTotalValue());
+        orderItemRepository.save(orderItem);
+
+        // Atualiza o estoque do produto
+        Product product = itemCart.getProduct();
+        int newAmount = product.getAmount() - itemCart.getQuantity();
+        if (newAmount < 0) {
+            return ResponseEntity.badRequest().build(); // Retorna um erro se a nova quantidade for negativa
+        }
+        product.setAmount(newAmount);
+        productRepository.save(product);
+
+        cart.getItens().remove(itemCart); // Remove a associação do item com o carrinho
+        itemCart.setCart(null); // Remove a associação do carrinho com o item
+        itemCartRepository.save(itemCart); // Salva o item sem a associação
+        itemCartRepository.delete(itemCart); // Agora você pode deletar o item
+    }
+
+    // Cria um novo carrinho para compras futuras
+    Cart newCart = new Cart();
+    newCart.setTotalValue(0f);
+    cartRepository.save(newCart);
+
+    // Retorna apenas o status OK sem corpo
+    return ResponseEntity.ok().build();
+}
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/getAllCartItems")
