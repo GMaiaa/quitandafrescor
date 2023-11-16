@@ -18,7 +18,10 @@ import com.example.quitandafrescor.dto.OrderUpdateDTO;
 import com.example.quitandafrescor.dto.OrderUpdateDTOReturn;
 import com.example.quitandafrescor.model.Cart;
 import com.example.quitandafrescor.model.Order;
+import com.example.quitandafrescor.model.OrderItem;
+import com.example.quitandafrescor.model.Product;
 import com.example.quitandafrescor.repository.OrderRepository;
+import com.example.quitandafrescor.repository.ProductRepository;
 
 @RestController
 @RequestMapping("order")
@@ -26,8 +29,11 @@ public class OrderController {
 
     private OrderRepository orderRepository;
 
-    public OrderController(OrderRepository orderRepository) {
+    private ProductRepository productRepository;
+
+    public OrderController(OrderRepository orderRepository, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
+        this.productRepository = productRepository;
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -54,8 +60,23 @@ public class OrderController {
         Optional<Order> optionalOrder = orderRepository.findById(id);
         if (optionalOrder.isPresent()) {
             Order order = optionalOrder.get();
+            String oldStatus = order.getStatus();
             order.setStatus(orderUpdateDto.status());
             orderRepository.save(order);
+
+            // Se o status do pedido foi alterado para "cancelado", reverter as alterações
+            // no estoque
+            if (!oldStatus.equals("🔴 Cancelado") && order.getStatus().equals("🔴 Cancelado")) {
+                for (OrderItem orderItem : order.getOrderItems()) {
+                    Optional<Product> optionalProduct = productRepository.findByName(orderItem.getProductName());
+                    if (optionalProduct.isPresent()) {
+                        Product product = optionalProduct.get();
+                        product.setAmount(product.getAmount() + orderItem.getQuantity());
+                        productRepository.save(product);
+                    }
+                }
+            }
+
             return ResponseEntity.ok(new OrderUpdateDTOReturn(order));
         } else {
             return ResponseEntity.notFound().build();

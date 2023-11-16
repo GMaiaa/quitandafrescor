@@ -85,7 +85,7 @@ public class CartController {
         order.setPhoneNumber(orderDto.phoneNumber());
         order.setPaymentMethod(orderDto.paymentMethod());
         order.setMoneyChange(orderDto.moneyChange());
-        order.setStatus("Waiting"); // Define o status do pedido como "Waiting"
+        order.setStatus("🟡 Pendente"); // Define o status do pedido como "Waiting"
 
         // Associa o carrinho ao pedido e salva o pedido
         order.setCart(cart);
@@ -101,6 +101,11 @@ public class CartController {
             orderItem.setQuantity(itemCart.getQuantity());
             orderItem.setSubTotalValue(itemCart.getSubTotalValue());
             orderItemRepository.save(orderItem);
+
+            // Atualiza o estoque do produto
+            Product product = itemCart.getProduct();
+            product.setAmount(product.getAmount() - itemCart.getQuantity());
+            productRepository.save(product);
 
             cart.getItens().remove(itemCart); // Remove a associação do item com o carrinho
             itemCart.setCart(null); // Remove a associação do carrinho com o item
