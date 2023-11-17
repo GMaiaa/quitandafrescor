@@ -72,7 +72,8 @@ public class OrderController {
             // no estoque
             if (!oldStatus.equals("🔴 Cancelado") && order.getStatus().equals("🔴 Cancelado")) {
                 for (OrderItem orderItem : order.getOrderItems()) {
-                    Optional<Product> optionalProduct = productRepository.findByName(orderItem.getProductName());
+                    Optional<Product> optionalProduct = productRepository
+                            .findByNameIgnoreCase(orderItem.getProductName());
                     if (optionalProduct.isPresent()) {
                         Product product = optionalProduct.get();
                         product.setAmount(product.getAmount() + orderItem.getQuantity());
@@ -100,7 +101,7 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     @CrossOrigin(origins = "*", allowedHeaders = "*")
 @GetMapping("/getMostOrderedProducts")
 public ResponseEntity<List<Map<String, Object>>> getMostOrderedProducts() {
@@ -113,8 +114,6 @@ public ResponseEntity<List<Map<String, Object>>> getMostOrderedProducts() {
             String productName = orderItem.getProductName();
             productCount.put(productName, productCount.getOrDefault(productName, 0) + orderItem.getQuantity());
         }
-    }
-
     // Ordena os produtos por quantidade pedida (do maior para o menor)
     List<Map<String, Object>> mostOrderedProducts = productCount.entrySet().stream()
             .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
