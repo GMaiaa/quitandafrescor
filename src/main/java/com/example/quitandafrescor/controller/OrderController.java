@@ -103,30 +103,28 @@ public class OrderController {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("/getMostOrderedProducts")
-    public ResponseEntity<List<Product>> getMostOrderedProducts() {
-        List<Order> orders = orderRepository.findAll();
+@GetMapping("/getMostOrderedProducts")
+public ResponseEntity<List<Map<String, Object>>> getMostOrderedProducts() {
+    List<Order> orders = orderRepository.findAll();
 
-        // Mapeia os produtos para contabilizar a quantidade pedida
-        Map<String, Integer> productCount = new HashMap<>();
-        for (Order order : orders) {
-            for (OrderItem orderItem : order.getOrderItems()) {
-                String productName = orderItem.getProductName();
-                productCount.put(productName, productCount.getOrDefault(productName, 0) + orderItem.getQuantity());
-            }
+    // Mapeia os produtos para contabilizar a quantidade pedida
+    Map<String, Integer> productCount = new HashMap<>();
+    for (Order order : orders) {
+        for (OrderItem orderItem : order.getOrderItems()) {
+            String productName = orderItem.getProductName();
+            productCount.put(productName, productCount.getOrDefault(productName, 0) + orderItem.getQuantity());
         }
+    // Ordena os produtos por quantidade pedida (do maior para o menor)
+    List<Map<String, Object>> mostOrderedProducts = productCount.entrySet().stream()
+            .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+            .map(entry -> {
+                Map<String, Object> productInfo = new HashMap<>();
+                productInfo.put("productName", entry.getKey());
+                productInfo.put("quantitySold", entry.getValue());
+                return productInfo;
+            })
+            .collect(Collectors.toList());
 
-        // Ordena os produtos por quantidade pedida (do maior para o menor)
-        List<Product> mostOrderedProducts = productCount.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .map(entry -> {
-                    // Busca os detalhes do produto a partir do repositório de produtos
-                    Optional<Product> optionalProduct = productRepository.findByNameIgnoreCase(entry.getKey());
-                    return optionalProduct.orElse(null);
-                })
-                .filter(Objects::nonNull) // Filtra produtos não encontrados
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(mostOrderedProducts);
-    }
+    return ResponseEntity.ok(mostOrderedProducts);
+}
 }
