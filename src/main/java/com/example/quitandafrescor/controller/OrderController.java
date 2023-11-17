@@ -114,6 +114,8 @@ public ResponseEntity<List<Map<String, Object>>> getMostOrderedProducts() {
             String productName = orderItem.getProductName();
             productCount.put(productName, productCount.getOrDefault(productName, 0) + orderItem.getQuantity());
         }
+    }
+
     // Ordena os produtos por quantidade pedida (do maior para o menor)
     List<Map<String, Object>> mostOrderedProducts = productCount.entrySet().stream()
             .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
@@ -127,4 +129,5 @@ public ResponseEntity<List<Map<String, Object>>> getMostOrderedProducts() {
 
     return ResponseEntity.ok(mostOrderedProducts);
 }
+
 }
