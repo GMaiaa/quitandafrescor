@@ -49,6 +49,12 @@ public class Order {
     @Column(name = "adressNumber", nullable = true)
     private Integer adressNumber;
 
+    @Column(name = "adress", nullable = true)
+    private String adress;
+
+    @Column(name = "complement", nullable = true)
+    private String complement;
+
     @Column(name = "phoneNumber", nullable = false)
     private String phoneNumber;
 

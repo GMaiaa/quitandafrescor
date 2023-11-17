@@ -30,6 +30,9 @@ import com.example.quitandafrescor.repository.CartRepository;
 import com.example.quitandafrescor.repository.ItemCartRepository;
 import com.example.quitandafrescor.repository.OrderItemRepository;
 import com.example.quitandafrescor.repository.ProductRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.example.quitandafrescor.repository.OrderRepository;
 
 @RestController
@@ -66,6 +69,7 @@ public class CartController {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @Transactional
     @PostMapping("/confirmPurchase")
     public ResponseEntity<Void> confirmPurchase(@RequestBody OrderRequestDTO orderDto) {
         // Busca o último carrinho de compras do repositório
@@ -82,6 +86,8 @@ public class CartController {
         order.setEmail(orderDto.email());
         order.setCep(orderDto.cep());
         order.setAdressNumber(orderDto.adressNumber());
+        order.setAdress(orderDto.adress());
+        order.setComplement(orderDto.complement());
         order.setPhoneNumber(orderDto.phoneNumber());
         order.setPaymentMethod(orderDto.paymentMethod());
         order.setMoneyChange(orderDto.moneyChange());
