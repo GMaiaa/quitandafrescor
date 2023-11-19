@@ -1,7 +1,6 @@
 package com.example.quitandafrescor.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,66 +17,42 @@ import com.example.quitandafrescor.dto.UserRequestDTO;
 import com.example.quitandafrescor.dto.UserResponseDTO;
 import com.example.quitandafrescor.dto.UserUpdateDTO;
 import com.example.quitandafrescor.dto.UserUpdateDTOReturn;
+import com.example.quitandafrescor.service.IUserService;
 
-import com.example.quitandafrescor.model.User;
-import com.example.quitandafrescor.repository.UserRepository;
-
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
-    private UserRepository userRepository;
+    private IUserService userService;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(IUserService userService) {
+        this.userService = userService;
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    @Transactional
     public void saveUser(@RequestBody @Valid UserRequestDTO data) {
-        User userData = new User(data);
-
-        userRepository.save(userData);
-
+        userService.saveUser(data);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping
     public List<UserResponseDTO> getAllUsers() {
-        return userRepository.findAll().stream().map(UserResponseDTO::new)
-                .toList();
+        return userService.getAllUsers();
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            userRepository.delete(optionalUser.get());
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return userService.deleteUser(id);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    @Transactional
     public ResponseEntity<UserUpdateDTOReturn> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO data) {
-        Optional<User> optionalUser = userRepository.findById(id);
-
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            user.updateUser(data);
-            userRepository.save(user);
-            return ResponseEntity.ok(new UserUpdateDTOReturn(user));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return userService.updateUser(id, data);
     }
 
 }

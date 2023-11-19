@@ -44,7 +44,7 @@ public class Order {
     private String email;
 
     @Column(name = "cep", nullable = true)
-    private Integer cep;
+    private String cep;
 
     @Column(name = "adressNumber", nullable = true)
     private Integer adressNumber;
