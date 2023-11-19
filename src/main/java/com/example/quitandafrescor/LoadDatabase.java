@@ -32,24 +32,24 @@ public class LoadDatabase {
                 // Adicione mais frutas aqui...
 
                 // Verduras
-                products.add(new Product(31L, "Alface Crespa", "Alface Crespa", 0.99f,
+                products.add(new Product(21L, "Alface Crespa", "Alface Crespa", 0.99f,
                         "https://www.aboaterra.com.br/wp-content/uploads/2022/07/Alface-Crespa-Organico.jpg", 200,
                         GREENERYS));
                 // Adicione mais verduras aqui...
 
                 // Legumes
-                products.add(new Product(61L, "Cenoura", "Cenoura", 0.89f,
+                products.add(new Product(41L, "Cenoura", "Cenoura", 0.89f,
                         "https://carrefourbrfood.vtexassets.com/arquivos/ids/12966487/cenoura-com-folhas-carrefour-400g-1.jpg?v=637479789303930000",
                         250, VEGETABLES));
                 // Adicione mais legumes aqui...
 
                 // Bebidas
-                products.add(new Product(91L, "Suco Maguary", "Suco de laranja Maguary 1L", 2.99f,
+                products.add(new Product(61L, "Suco Maguary", "Suco de laranja Maguary 1L", 2.99f,
                         "https://m.media-amazon.com/images/I/81HtFrrCyWL._AC_UF1000,1000_QL80_.jpg", 80, DRINKS));
                 // Adicione mais bebidas aqui...
 
                 // Não alimentar
-                products.add(new Product(121L, "Bombril", "Bombril ", 0.99f,
+                products.add(new Product(81L, "Bombril", "Bombril ", 0.99f,
                         "https://gruposoares.vtexassets.com/arquivos/ids/171511/Esponja-de-Aco-Bombril-com-8-unidades.jpg?v=638204484766530000",
                         100, NON_FOODS));
                 // Adicione mais produtos não alimentares aqui...
