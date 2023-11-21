@@ -11,7 +11,11 @@ import com.example.quitandafrescor.dto.ProductRequestDTO;
 import com.example.quitandafrescor.dto.ProductResponseDTO;
 import com.example.quitandafrescor.dto.ProductUpdateDTO;
 import com.example.quitandafrescor.dto.ProductUpdateDTOReturn;
+import com.example.quitandafrescor.model.Cart;
+import com.example.quitandafrescor.model.ItemCart;
 import com.example.quitandafrescor.model.Product;
+import com.example.quitandafrescor.repository.CartRepository;
+import com.example.quitandafrescor.repository.ItemCartRepository;
 import com.example.quitandafrescor.repository.ProductRepository;
 
 import jakarta.transaction.Transactional;
@@ -21,8 +25,15 @@ public class ProductService implements IProductService {
 
     private ProductRepository productRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    private ItemCartRepository itemCartRepository;
+
+    private CartRepository cartRepository;
+
+    public ProductService(ProductRepository productRepository, ItemCartRepository itemCartRepository,
+            CartRepository cartRepository) {
         this.productRepository = productRepository;
+        this.itemCartRepository = itemCartRepository;
+        this.cartRepository = cartRepository;
     }
 
     public List<ProductResponseDTO> getRelatedProducts(String category) {
@@ -65,7 +76,24 @@ public class ProductService implements IProductService {
     public ResponseEntity<Void> deleteProduct(Long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
-            productRepository.delete(optionalProduct.get());
+            Product product = optionalProduct.get();
+
+            // Buscar todos os ItemCart que contêm o produto
+            List<ItemCart> items = itemCartRepository.findAllByProduct(product);
+
+            // Remover o produto de todos os ItemCart
+            for (ItemCart item : items) {
+                // Atualizar o valor total do carrinho
+                Cart cart = item.getCart();
+                cart.setTotalValue(cart.getTotalValue() - item.getSubTotalValue());
+                cartRepository.save(cart);
+
+                // Deletar o ItemCart
+                itemCartRepository.delete(item);
+            }
+
+            // Agora você pode deletar o produto
+            productRepository.delete(product);
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
