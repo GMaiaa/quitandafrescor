@@ -63,6 +63,11 @@ public class CartService implements ICartService {
         }
         Cart cart = carts.get(carts.size() - 1);
 
+        // Verifica se o carrinho está vazio
+        if (cart.getItens().isEmpty()) {
+            return ResponseEntity.badRequest().build(); // Retorna um erro se o carrinho estiver vazio
+        }
+
         // Cria um novo pedido a partir do DTO
         Order order = new Order();
         order.setClient(orderDto.client());
