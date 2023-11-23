@@ -13,49 +13,109 @@ import java.util.List;
 @Configuration
 public class LoadDatabase {
 
-    private static final String FRUITS = "Fruta";
-    private static final String GREENERYS = "Verdura";
-    private static final String VEGETABLES = "Legume";
-    private static final String DRINKS = "Bebida";
-    private static final String NON_FOODS = "Não alimentar";
+        private static final String FRUITS = "Fruta";
+        private static final String GREENERYS = "Verdura";
+        private static final String VEGETABLES = "Legume";
+        private static final String DRINKS = "Bebida";
+        private static final String NON_FOODS = "Não alimentar";
 
-    @Bean
-    public CommandLineRunner initProductDatabase(ProductRepository productRepository) {
-        return args -> {
-            if (productRepository.count() == 0) {
-                List<Product> products = new ArrayList<>();
+        @Bean
+        public CommandLineRunner initProductDatabase(ProductRepository productRepository) {
+                return args -> {
+                        if (productRepository.count() == 0) {
+                                List<Product> products = new ArrayList<>();
 
-                // Frutas
-                products.add(new Product(1L, "Maçã", "Maçã", 1.99f,
-                        "https://scfoods.fbitsstatic.net/img/p/maca-red-argentina-unidade-70942/257561.jpg?w=800&h=800&v=no-change&qs=ignore",
-                        150, FRUITS));
-                // Adicione mais frutas aqui...
+                                // Frutas
+                                products.add(new Product(1L, "Maçã", "Maçã", 1.99f,
+                                                "https://scfoods.fbitsstatic.net/img/p/maca-red-argentina-unidade-70942/257561.jpg?w=800&h=800&v=no-change&qs=ignore",
+                                                150, FRUITS));
+                                products.add(new Product(2L, "Uva Verde", "Uva verde sem semente 1 caixa", 4.00f,
+                                                "https://img.irroba.com.br/fit-in/600x600/filters:fill(transparent):quality(80)/shoeboxs/catalog/80039.png",
+                                                150, FRUITS));
+                                products.add(new Product(3L, "Banana", "Banana Prata", 1.00f,
+                                                "https://acdn.mitiendanube.com/stores/001/254/392/products/frutas_hortifruti_hortifit_delivery_banana-prata_211-8db6d3e5f3613fb8be16922801932891-1024-1024.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(4L, "Laranja Lima", "Laranja Lima", 1.50f,
+                                                "https://www.proativaalimentos.com.br/image/cache/catalog/img_prod/Laranja_lima_600x600[1]-1000x1000.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(5L, "Morango", "Morango 1 caixa", 4.00f,
+                                                "https://cdn.shoppub.io/cdn-cgi/image/w=1000,h=1000,q=80,f=auto/cenourao/media/uploads/produtos/foto/nhkgvszz/morango.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(6L, "Abacaxi", "Abacaxi", 4.99f,
+                                                "https://naturaldaterra.com.br/media/catalog/product/1/3/137479---2080540000003---abacaxi-org-kg.jpg?auto=webp&format=pjpg&width=640&height=800&fit=cover",
+                                                150, FRUITS));
+                                products.add(new Product(7L, "Mamão Papaia", "Mamão Papaia", 4.50f,
+                                                "https://loja.doiscunhados.com.br/wp-content/uploads/2020/03/mamao-papaia.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(8L, "Pêra Williams", "Pêra Williams", 2.00f,
+                                                "https://static.wixstatic.com/media/d40923_842e71d1f11b4ca19f2701039dac4ed3~mv2.jpg/v1/crop/x_46,y_40,w_655,h_689/fill/w_380,h_402,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/d40923_842e71d1f11b4ca19f2701039dac4ed3~mv2.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(9L, "Manga", "Manga", 4.99f,
+                                                "https://www.quitandatomio.com.br/upload/1085343213-beneficios-da-manga-palmer-para-a-saude.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(10L, "Melancia", "Melancia", 7.99f,
+                                                "https://revistacampoenegocios.com.br/wp-content/uploads/2020/11/Melancia-01.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(11L, "Kiwi", "Kiwi", 2.99f,
+                                                "https://images.tcdn.com.br/img/img_prod/924009/kiwi_129_1_747cd5f775f304e08b3b2f0eabe55539.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(12L, "Pêssego", "Pêssego", 2.99f,
+                                                "https://hortifrutijardins.com.br/wp-content/uploads/2020/10/pessego-beneficios.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(13L, "Abacate", "Abacate", 4.99f,
+                                                "https://acdn.mitiendanube.com/stores/746/397/products/abacate21-1070ab6091f64b1fe415220054831312-640-0.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(14L, "Caju", "Caju", 2.50f,
+                                                "https://img.irroba.com.br/fit-in/600x600/filters:fill(transparent):quality(80)/shoeboxs/catalog/80039.png",
+                                                150, FRUITS));
+                                products.add(new Product(15L, "Limão Taiti", "Limão Taiti", 1.00f,
+                                                "https://static.significados.com.br/foto/limao-taiti-cke.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(16L, "Limão Siciliano", "Limão Siciliano", 2.50f,
+                                                "https://global.cdn.magazord.com.br/vasoeflor/img/2022/07/produto/1074/muda-limao-siciliano-90cm.jpg?ims=fit-in/800x800/filters:fill(white)",
+                                                150, FRUITS));
+                                products.add(new Product(17L, "Maracujá", "Maracujá", 3.50f,
+                                                "https://camposverde.ao/wp-content/uploads/2023/01/maracuja.webp",
+                                                150, FRUITS));
+                                products.add(new Product(18L, "Melão", "Melão", 4.99f,
+                                                "https://www.proativaalimentos.com.br/image/cache/catalog/img_prod/melaoamarelo1_502698640_jpg_1024x1024[1]-1000x1000.jpg",
+                                                150, FRUITS));
+                                products.add(new Product(19L, "Pitaya", "Pitaya", 6.50f,
+                                                "https://boa.vtexassets.com/unsafe/fit-in/720x720/center/middle/https%3A%2F%2Fboa.vtexassets.com%2Farquivos%2Fids%2F354195%2FPitaya-Selecionada-kg.jpg%3Fv%3D638219250456330000",
+                                                150, FRUITS));
+                                products.add(new Product(20L, "Goiaba", "Goiaba", 3.00f,
+                                                "https://savegnagoio.vtexassets.com/arquivos/ids/353920-800-450?v=638080435664030000&width=800&height=450&aspect=true",
+                                                150, FRUITS));
 
-                // Verduras
-                products.add(new Product(21L, "Alface Crespa", "Alface Crespa", 0.99f,
-                        "https://www.aboaterra.com.br/wp-content/uploads/2022/07/Alface-Crespa-Organico.jpg", 200,
-                        GREENERYS));
-                // Adicione mais verduras aqui...
+                                // Adicione mais frutas aqui...
 
-                // Legumes
-                products.add(new Product(41L, "Cenoura", "Cenoura", 0.89f,
-                        "https://carrefourbrfood.vtexassets.com/arquivos/ids/12966487/cenoura-com-folhas-carrefour-400g-1.jpg?v=637479789303930000",
-                        250, VEGETABLES));
-                // Adicione mais legumes aqui...
+                                // Verduras
+                                products.add(new Product(21L, "Alface Crespa", "Alface Crespa", 0.99f,
+                                                "https://www.aboaterra.com.br/wp-content/uploads/2022/07/Alface-Crespa-Organico.jpg",
+                                                200,
+                                                GREENERYS));
+                                // Adicione mais verduras aqui...
 
-                // Bebidas
-                products.add(new Product(61L, "Suco Maguary", "Suco de laranja Maguary 1L", 2.99f,
-                        "https://m.media-amazon.com/images/I/81HtFrrCyWL._AC_UF1000,1000_QL80_.jpg", 80, DRINKS));
-                // Adicione mais bebidas aqui...
+                                // Legumes
+                                products.add(new Product(41L, "Cenoura", "Cenoura", 0.89f,
+                                                "https://carrefourbrfood.vtexassets.com/arquivos/ids/12966487/cenoura-com-folhas-carrefour-400g-1.jpg?v=637479789303930000",
+                                                250, VEGETABLES));
+                                // Adicione mais legumes aqui...
 
-                // Não alimentar
-                products.add(new Product(81L, "Bombril", "Bombril ", 0.99f,
-                        "https://gruposoares.vtexassets.com/arquivos/ids/171511/Esponja-de-Aco-Bombril-com-8-unidades.jpg?v=638204484766530000",
-                        100, NON_FOODS));
-                // Adicione mais produtos não alimentares aqui...
+                                // Bebidas
+                                products.add(new Product(61L, "Suco Maguary", "Suco de laranja Maguary 1L", 2.99f,
+                                                "https://m.media-amazon.com/images/I/81HtFrrCyWL._AC_UF1000,1000_QL80_.jpg",
+                                                80, DRINKS));
+                                // Adicione mais bebidas aqui...
 
-                productRepository.saveAll(products);
-            }
-        };
-    }
+                                // Não alimentar
+                                products.add(new Product(81L, "Bombril", "Bombril ", 0.99f,
+                                                "https://gruposoares.vtexassets.com/arquivos/ids/171511/Esponja-de-Aco-Bombril-com-8-unidades.jpg?v=638204484766530000",
+                                                100, NON_FOODS));
+                                // Adicione mais produtos não alimentares aqui...
+
+                                productRepository.saveAll(products);
+                        }
+                };
+        }
 }
