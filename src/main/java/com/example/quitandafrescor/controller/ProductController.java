@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 import com.example.quitandafrescor.dto.ProductRequestDTO;
 import com.example.quitandafrescor.dto.ProductResponseDTO;
@@ -64,6 +65,13 @@ public class ProductController {
     public ResponseEntity<ProductUpdateDTOReturn> updateProduct(@PathVariable Long id,
             @RequestBody ProductUpdateDTO data) {
         return productService.updateProduct(id, data);
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("/findByName")
+    public List<ProductResponseDTO> findProductByName(@RequestBody Map<String, String> body) {
+        String name = body.get("name");
+        return productService.findProductByName(name);
     }
 
 }

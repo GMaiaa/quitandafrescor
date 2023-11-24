@@ -21,4 +21,6 @@ public interface IProductService {
     ResponseEntity<Void> deleteProduct(Long id);
 
     ResponseEntity<ProductUpdateDTOReturn> updateProduct(Long id, ProductUpdateDTO data);
+
+     List<ProductResponseDTO> findProductByName(String name);
 }
