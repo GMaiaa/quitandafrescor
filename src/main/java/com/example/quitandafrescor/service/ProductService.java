@@ -1,5 +1,6 @@
 package com.example.quitandafrescor.service;
 
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +43,8 @@ public class ProductService implements IProductService {
                 .toList();
     }
 
+
+    @Transactional
     public ResponseEntity<String> saveProduct(ProductRequestDTO data) {
         Optional<Product> existingProductWithName = productRepository.findByNameIgnoreCase(data.name());
         Optional<Product> existingProductWithImage = productRepository.findByImage(data.image());
@@ -113,4 +116,20 @@ public class ProductService implements IProductService {
             return ResponseEntity.notFound().build();
         }
     }
+
+    public List<ProductResponseDTO> findProductByName(String name) {
+    // Normaliza o nome para ignorar case e acentos
+    String normalized = Normalizer.normalize(name, Normalizer.Form.NFD)
+        .replaceAll("[^\\p{ASCII}]", "")
+        .toLowerCase();
+
+    // Filtra os produtos pelo nome normalizado
+    return productRepository.findAll().stream()
+        .filter(product -> Normalizer.normalize(product.getName(), Normalizer.Form.NFD)
+            .replaceAll("[^\\p{ASCII}]", "")
+            .toLowerCase()
+            .contains(normalized))
+        .map(ProductResponseDTO::new)
+        .toList();
+}
 }
