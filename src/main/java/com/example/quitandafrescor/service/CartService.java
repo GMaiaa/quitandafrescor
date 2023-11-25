@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,19 +34,24 @@ import jakarta.transaction.Transactional;
 @Service
 public class CartService implements ICartService {
 
+    Logger logger = LoggerFactory.getLogger(CartService.class);
+
     private ProductRepository productRepository;
     private ItemCartRepository itemCartRepository;
     private OrderRepository orderRepository;
     private CartRepository cartRepository;
     private OrderItemRepository orderItemRepository;
+    private EmailService emailService;
 
     public CartService(ProductRepository productRepository, ItemCartRepository itemCartRepository,
-            CartRepository cartRepository, OrderRepository orderRepository, OrderItemRepository orderItemRepository) {
+            CartRepository cartRepository, OrderRepository orderRepository, OrderItemRepository orderItemRepository,
+            EmailService emailService) {
         this.productRepository = productRepository;
         this.itemCartRepository = itemCartRepository;
         this.cartRepository = cartRepository;
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
+        this.emailService = emailService;
 
     }
 
@@ -90,6 +98,11 @@ public class CartService implements ICartService {
             order.setCart(cart);
             orderRepository.save(order);
 
+            // Envia um email de confirmação para o cliente
+            String subject = "Confirmação de Compra";
+            String text = "Olá " + orderDto.client() + ",\n\nSua compra foi confirmada com sucesso!";
+            emailService.sendConfirmationEmail(orderDto.email(), subject, text);
+
             // Cria um OrderItem para cada ItemCart no carrinho e deleta o ItemCart
             List<ItemCart> items = new ArrayList<>(cart.getItens());
             for (ItemCart itemCart : items) {
@@ -125,6 +138,7 @@ public class CartService implements ICartService {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             // Aqui você pode adicionar um log do erro
+            logger.error("Erro ao confirmar a compra", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao confirmar a compra");
         }
     }
