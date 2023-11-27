@@ -65,79 +65,131 @@ public class CartService implements ICartService {
         return totalValue;
     }
 
+    private void recalculateCartTotalValue(Cart cart) {
+        cart.setTotalValue(calculateTotalCartValue());
+        cartRepository.save(cart);
+    }
+
+    private Order createOrder(OrderRequestDTO orderDto) {
+        Order order = new Order();
+        order.setClient(orderDto.client());
+        order.setCpf(orderDto.cpf());
+        order.setEmail(orderDto.email());
+        order.setCep(orderDto.cep());
+        order.setAdressNumber(orderDto.adressNumber());
+        order.setAdress(orderDto.adress());
+        order.setComplement(orderDto.complement());
+        order.setPhoneNumber(orderDto.phoneNumber());
+        order.setPaymentMethod(orderDto.paymentMethod());
+        order.setMoneyChange(orderDto.moneyChange());
+        order.setStatus("🟡 Pendente");
+        return order;
+    }
+
+    private void sendConfirmationEmail(OrderRequestDTO orderDto) {
+        String subject = "Confirmação de Compra";
+        String text = "Olá " + orderDto.client() + ",\n\nSua compra foi confirmada com sucesso!";
+        emailService.sendConfirmationEmail(orderDto.email(), subject, text);
+    }
+
+    private void createOrderItemsAndDeleteCartItems(Order order, Cart cart) {
+        List<ItemCart> items = new ArrayList<>(cart.getItens());
+        for (ItemCart itemCart : items) {
+            OrderItem orderItem = createOrderItem(order, itemCart);
+            orderItemRepository.save(orderItem);
+            updateProductStock(itemCart);
+            cart.getItens().remove(itemCart);
+            itemCart.setCart(null);
+            itemCartRepository.save(itemCart);
+            itemCartRepository.delete(itemCart);
+        }
+    }
+
+    private OrderItem createOrderItem(Order order, ItemCart itemCart) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrder(order);
+        orderItem.setProductName(itemCart.getProduct().getName());
+        orderItem.setProductValue(itemCart.getProductValue());
+        orderItem.setQuantity(itemCart.getQuantity());
+        orderItem.setSubTotalValue(itemCart.getSubTotalValue());
+        return orderItem;
+    }
+
+    private void updateProductStock(ItemCart itemCart) {
+        Product product = itemCart.getProduct();
+        int newAmount = product.getAmount() - itemCart.getQuantity();
+        if (newAmount < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade insuficiente em estoque");
+        }
+        product.setAmount(newAmount);
+        productRepository.save(product);
+    }
+
+    private void createNewCart() {
+        Cart newCart = new Cart();
+        newCart.setTotalValue(0f);
+        cartRepository.save(newCart);
+    }
+
+    private Product getProduct(Long id) {
+        Optional<Product> prod = productRepository.findById(id);
+        if (prod.isPresent()) {
+            return prod.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado");
+        }
+    }
+
+    private Cart createCart() {
+        List<Cart> carts = cartRepository.findAll();
+        if (carts.isEmpty() || carts.get(carts.size() - 1).getOrder() != null) {
+            Cart cart = new Cart();
+            cart.setTotalValue(0f);
+            cartRepository.save(cart);
+            return cart;
+        } else {
+            return carts.get(carts.size() - 1);
+        }
+    }
+
+    private ItemCart getExistingItem(Cart cart, Product product) {
+        Optional<ItemCart> existingItem = cart.getItens().stream()
+                .filter(item -> item.getProduct().getId().equals(product.getId()))
+                .findFirst();
+        return existingItem.orElse(null);
+    }
+
+    private void addNewItemToCart(Cart cart, Product product) {
+        ItemCart item = new ItemCart();
+        item.setProduct(product);
+        item.setProductValue(product.getValue());
+        item.setQuantity(1);
+        item.setSubTotalValue(item.getProductValue() * item.getQuantity());
+        item.setCart(cart);
+        itemCartRepository.save(item);
+        cart.getItens().add(item);
+    }
+
     @Transactional
     public ResponseEntity<Void> confirmPurchase(OrderRequestDTO orderDto) {
-        // Busca o último carrinho de compras do repositório
         Cart cart = cartRepository.findFirstByOrderByIdDesc();
-        if (cart == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Carrinho não encontrado");
-        }
-
-        // Verifica se o carrinho está vazio
-        if (cart.getItens().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Carrinho está vazio");
+        if (cart == null || cart.getItens().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Carrinho não encontrado ou está vazio");
         }
 
         try {
-            // Cria um novo pedido a partir do DTO
-            Order order = new Order();
-            // Aqui você pode adicionar validações para cada campo
-            order.setClient(orderDto.client());
-            order.setCpf(orderDto.cpf());
-            order.setEmail(orderDto.email());
-            order.setCep(orderDto.cep());
-            order.setAdressNumber(orderDto.adressNumber());
-            order.setAdress(orderDto.adress());
-            order.setComplement(orderDto.complement());
-            order.setPhoneNumber(orderDto.phoneNumber());
-            order.setPaymentMethod(orderDto.paymentMethod());
-            order.setMoneyChange(orderDto.moneyChange());
-            order.setStatus("🟡 Pendente"); // Define o status do pedido como "Waiting"
-
-            // Associa o carrinho ao pedido e salva o pedido
+            Order order = createOrder(orderDto);
             order.setCart(cart);
             orderRepository.save(order);
 
-            // Envia um email de confirmação para o cliente
-            String subject = "Confirmação de Compra";
-            String text = "Olá " + orderDto.client() + ",\n\nSua compra foi confirmada com sucesso!";
-            emailService.sendConfirmationEmail(orderDto.email(), subject, text);
+            sendConfirmationEmail(orderDto);
 
-            // Cria um OrderItem para cada ItemCart no carrinho e deleta o ItemCart
-            List<ItemCart> items = new ArrayList<>(cart.getItens());
-            for (ItemCart itemCart : items) {
-                OrderItem orderItem = new OrderItem();
-                orderItem.setOrder(order);
-                orderItem.setProductName(itemCart.getProduct().getName());
-                orderItem.setProductValue(itemCart.getProductValue());
-                orderItem.setQuantity(itemCart.getQuantity());
-                orderItem.setSubTotalValue(itemCart.getSubTotalValue());
-                orderItemRepository.save(orderItem);
+            createOrderItemsAndDeleteCartItems(order, cart);
 
-                // Atualiza o estoque do produto
-                Product product = itemCart.getProduct();
-                int newAmount = product.getAmount() - itemCart.getQuantity();
-                if (newAmount < 0) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade insuficiente em estoque");
-                }
-                product.setAmount(newAmount);
-                productRepository.save(product);
+            createNewCart();
 
-                cart.getItens().remove(itemCart); // Remove a associação do item com o carrinho
-                itemCart.setCart(null); // Remove a associação do carrinho com o item
-                itemCartRepository.save(itemCart); // Salva o item sem a associação
-                itemCartRepository.delete(itemCart); // Agora você pode deletar o item
-            }
-
-            // Cria um novo carrinho para compras futuras
-            Cart newCart = new Cart();
-            newCart.setTotalValue(0f);
-            cartRepository.save(newCart);
-
-            // Retorna apenas o status OK sem corpo
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            // Aqui você pode adicionar um log do erro
             logger.error("Erro ao confirmar a compra", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao confirmar a compra");
         }
@@ -159,55 +211,21 @@ public class CartService implements ICartService {
 
     @Transactional
     public ResponseEntity<Void> addCart(Long id) {
-        Optional<Product> prod = productRepository.findById(id);
-        if (prod.isPresent()) {
-            Product product = prod.get();
+        Product product = getProduct(id);
+        Cart cart = createCart();
+        ItemCart existingItem = getExistingItem(cart, product);
 
-            // Busca o carrinho de compras do repositório
-            List<Cart> carts = cartRepository.findAll();
-
-            // Se não houver nenhum carrinho ou o último carrinho já estiver associado a um
-            // pedido, cria um novo carrinho
-            Cart cart;
-            if (carts.isEmpty() || carts.get(carts.size() - 1).getOrder() != null) {
-                cart = new Cart();
-                cart.setTotalValue(0f);
-                cartRepository.save(cart);
-            } else {
-                cart = carts.get(carts.size() - 1);
-            }
-
-            // Verifica se o produto já está no carrinho
-            Optional<ItemCart> existingItem = cart.getItens().stream()
-                    .filter(item -> item.getProduct().getId().equals(product.getId()))
-                    .findFirst();
-
-            if (existingItem.isPresent()) {
-                // Se o produto já está no carrinho, apenas incrementa a quantidade
-                ItemCart item = existingItem.get();
-                item.setQuantity(item.getQuantity() + 1);
-                item.setSubTotalValue(item.getProductValue() * item.getQuantity());
-                itemCartRepository.save(item);
-            } else {
-                // Se o produto não está no carrinho, adiciona um novo item
-                ItemCart item = new ItemCart();
-                item.setProduct(product);
-                item.setProductValue(product.getValue());
-                item.setQuantity(1);
-                item.setSubTotalValue(item.getProductValue() * item.getQuantity());
-                item.setCart(cart); // Associa o item ao carrinho
-                itemCartRepository.save(item);
-                cart.getItens().add(item); // Atualiza a lista de itens no carrinho
-            }
-
-            // Recalcula o valor total do carrinho
-            cart.setTotalValue(calculateTotalCartValue());
-            cartRepository.save(cart);
-
-            return ResponseEntity.ok().build();
+        if (existingItem != null) {
+            existingItem.setQuantity(existingItem.getQuantity() + 1);
+            existingItem.setSubTotalValue(existingItem.getProductValue() * existingItem.getQuantity());
+            itemCartRepository.save(existingItem);
         } else {
-            return ResponseEntity.notFound().build();
+            addNewItemToCart(cart, product);
         }
+
+        recalculateCartTotalValue(cart);
+
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<ItemCartResponseDTO> getCartById(Long id) {
@@ -222,6 +240,7 @@ public class CartService implements ICartService {
         }
     }
 
+    @Transactional
     public ResponseEntity<ItemCartUpdateDTOReturn> updateItemCartQuantity(Long id, ItemCartRequestDTO request) {
         Optional<ItemCart> itemOpt = itemCartRepository.findById(id);
         if (itemOpt.isPresent()) {
@@ -232,10 +251,8 @@ public class CartService implements ICartService {
             Product product = item.getProduct();
             ItemCartUpdateDTOReturn response = new ItemCartUpdateDTOReturn(product, item);
 
-            // Recalcula o valor total do carrinho
             Cart cart = item.getCart();
-            cart.setTotalValue(calculateTotalCartValue());
-            cartRepository.save(cart);
+            recalculateCartTotalValue(cart);
 
             return ResponseEntity.ok(response);
         } else {
@@ -248,10 +265,8 @@ public class CartService implements ICartService {
         if (itemOpt.isPresent()) {
             ItemCart item = itemOpt.get();
 
-            // Recalcula o valor total do carrinho antes de excluir o item
             Cart cart = item.getCart();
-            cart.setTotalValue(cart.getTotalValue() - item.getSubTotalValue());
-            cartRepository.save(cart);
+            recalculateCartTotalValue(cart);
 
             itemCartRepository.deleteById(id);
             return ResponseEntity.ok().build();
