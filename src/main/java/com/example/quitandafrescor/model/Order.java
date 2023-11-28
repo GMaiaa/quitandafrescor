@@ -43,6 +43,9 @@ public class Order {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "deliveryType", nullable = true)
+    private String deliveryType;
+
     @Column(name = "cep", nullable = true)
     private String cep;
 

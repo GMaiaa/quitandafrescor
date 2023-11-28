@@ -75,11 +75,12 @@ public class CartService implements ICartService {
         order.setClient(orderDto.client());
         order.setCpf(orderDto.cpf());
         order.setEmail(orderDto.email());
+        order.setPhoneNumber(orderDto.phoneNumber());
+        order.setDeliveryType(orderDto.deliveryType());
         order.setCep(orderDto.cep());
         order.setAdressNumber(orderDto.adressNumber());
         order.setAdress(orderDto.adress());
         order.setComplement(orderDto.complement());
-        order.setPhoneNumber(orderDto.phoneNumber());
         order.setPaymentMethod(orderDto.paymentMethod());
         order.setMoneyChange(orderDto.moneyChange());
         order.setStatus("🟡 Pendente");

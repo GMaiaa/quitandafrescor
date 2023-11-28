@@ -7,7 +7,8 @@ import java.util.stream.Collectors;
 import com.example.quitandafrescor.model.Cart;
 import com.example.quitandafrescor.model.Order;
 
-public record OrderResponseDTO(Long id, String client, String cpf, String email, String cep, String adress,
+public record OrderResponseDTO(Long id, String client, String cpf, String email, String deliveryType, String cep,
+                String adress,
                 Integer adressNumber, String complement, String phoneNumber, String paymentMethod, Float moneyChange,
                 Long cartId, Date orderDate,
                 String status, Float totalValue, List<OrderItemResponseDTO> items) {
@@ -17,6 +18,7 @@ public record OrderResponseDTO(Long id, String client, String cpf, String email,
                                 order.getClient(),
                                 order.getCpf(),
                                 order.getEmail(),
+                                order.getDeliveryType(),
                                 order.getCep(),
                                 order.getAdress(),
                                 order.getAdressNumber(),

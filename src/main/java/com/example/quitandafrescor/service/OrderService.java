@@ -25,10 +25,13 @@ public class OrderService implements IOrderService {
 
     private OrderRepository orderRepository;
     private ProductRepository productRepository;
+    private EmailService emailService;
 
-    public OrderService(OrderRepository orderRepository, ProductRepository productRepository) {
+    public OrderService(OrderRepository orderRepository, ProductRepository productRepository,
+            EmailService emailService) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
+        this.emailService = emailService;
     }
 
     public ResponseEntity<List<OrderResponseDTO>> getAllOrders() {
@@ -66,6 +69,39 @@ public class OrderService implements IOrderService {
                         productRepository.save(product);
                     }
                 }
+            }
+
+            // Se o status do pedido foi alterado para "🟠 Preparando", enviar um e-mail
+            // para o cliente
+            if (order.getStatus().equals("🟠 Preparando")) {
+                String subject = "Seu pedido está sendo preparado";
+                String text = "Olá " + order.getClient() + ",\n\nSeu pedido já está sendo preparado!";
+                emailService.sendConfirmationEmail(order.getEmail(), subject, text);
+            }
+
+            // Se o status do pedido foi alterado para "🔵 Entregando", enviar um e-mail
+            // para o cliente
+            if (order.getStatus().equals("🔵 Entregando")) {
+                String subject = "Seu pedido está sendo entregue";
+                String text = "Olá " + order.getClient() + ",\n\nSeu pedido está sendo entregue para o endereço "
+                        + order.getAdress() + ", número " + order.getAdressNumber() + ".";
+                emailService.sendConfirmationEmail(order.getEmail(), subject, text);
+            }
+
+            // Se o status do pedido foi alterado para "🟢 Entregue", enviar um e-mail
+            // para o cliente
+            if (order.getStatus().equals("🟢 Entregue")) {
+                String subject = "Seu pedido foi entregue";
+                String text = "Olá " + order.getClient() + ",\n\nSeu pedido foi entregue com sucesso!.";
+                emailService.sendConfirmationEmail(order.getEmail(), subject, text);
+            }
+
+            // Se o status do pedido foi alterado para "🔴 Cancelado", enviar um e-mail
+            // para o cliente
+            if (order.getStatus().equals("🔴 Cancelado")) {
+                String subject = "Seu pedido foi cancelado com sucesso";
+                String text = "Olá " + order.getClient() + ",\n\nInformamos que seu pedido foi cancelado com sucesso.";
+                emailService.sendConfirmationEmail(order.getEmail(), subject, text);
             }
 
             return ResponseEntity.ok(new OrderUpdateDTOReturn(order));
