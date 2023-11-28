@@ -74,4 +74,9 @@ public class ProductController {
         return productService.findProductByName(name);
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping("/orderedByAmount")
+    public List<ProductResponseDTO> getAllOrderedByAmount() {
+        return productService.getAllOrderedByAmount();
+    }
 }

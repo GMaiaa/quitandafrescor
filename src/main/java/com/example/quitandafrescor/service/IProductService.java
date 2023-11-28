@@ -22,5 +22,7 @@ public interface IProductService {
 
     ResponseEntity<ProductUpdateDTOReturn> updateProduct(Long id, ProductUpdateDTO data);
 
-     List<ProductResponseDTO> findProductByName(String name);
+    List<ProductResponseDTO> findProductByName(String name);
+
+    List<ProductResponseDTO> getAllOrderedByAmount();
 }

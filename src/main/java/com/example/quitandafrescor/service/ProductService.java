@@ -37,12 +37,17 @@ public class ProductService implements IProductService {
         this.cartRepository = cartRepository;
     }
 
+    public List<ProductResponseDTO> getAllOrderedByAmount() {
+        return productRepository.findAllByOrderByAmountAsc().stream()
+                .map(ProductResponseDTO::new)
+                .toList();
+    }
+
     public List<ProductResponseDTO> getRelatedProducts(String category) {
         return productRepository.findByCategory(category).stream()
                 .map(ProductResponseDTO::new)
                 .toList();
     }
-
 
     @Transactional
     public ResponseEntity<String> saveProduct(ProductRequestDTO data) {
@@ -118,18 +123,18 @@ public class ProductService implements IProductService {
     }
 
     public List<ProductResponseDTO> findProductByName(String name) {
-    // Normaliza o nome para ignorar case e acentos
-    String normalized = Normalizer.normalize(name, Normalizer.Form.NFD)
-        .replaceAll("[^\\p{ASCII}]", "")
-        .toLowerCase();
+        // Normaliza o nome para ignorar case e acentos
+        String normalized = Normalizer.normalize(name, Normalizer.Form.NFD)
+                .replaceAll("[^\\p{ASCII}]", "")
+                .toLowerCase();
 
-    // Filtra os produtos pelo nome normalizado
-    return productRepository.findAll().stream()
-        .filter(product -> Normalizer.normalize(product.getName(), Normalizer.Form.NFD)
-            .replaceAll("[^\\p{ASCII}]", "")
-            .toLowerCase()
-            .contains(normalized))
-        .map(ProductResponseDTO::new)
-        .toList();
-}
+        // Filtra os produtos pelo nome normalizado
+        return productRepository.findAll().stream()
+                .filter(product -> Normalizer.normalize(product.getName(), Normalizer.Form.NFD)
+                        .replaceAll("[^\\p{ASCII}]", "")
+                        .toLowerCase()
+                        .contains(normalized))
+                .map(ProductResponseDTO::new)
+                .toList();
+    }
 }
